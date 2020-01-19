@@ -2,48 +2,46 @@ const path = require( 'path' )
 
 const imageToAscii = require( 'image-to-ascii' )
 
-// const { fork } = require( 'child_process' )
+const { fork } = require( 'child_process' )
 
-// let renderPool = []
+let renderPool = []
 
-// let lastRenderedFrameTime = 0
+let lastRenderedFrameTime = 0
 
-// function forkRenderThread()
-// {
-//   const worker = fork( path.join( __dirname, 'renderpool' ),
-//     {
-//       // stdio: 'inherit'
-//     }
-//   )
+function forkRenderThread()
+{
+  const worker = fork( path.join( __dirname, 'renderpool' ),
+    {
+      // stdio: 'inherit'
+    }
+  )
 
-//   worker.on( 'message', ( [ message, timestamp ] ) =>
-//     {
-//       if ( timestamp > lastRenderedFrameTime )
-//       {
-//         message.forEach( ( line, index ) => drawLine( line, index ) )
+  worker.on( 'message', ( [ message, timestamp ] ) =>
+    {
+      if ( timestamp > lastRenderedFrameTime )
+      {
+        message.forEach( ( line, index ) => drawLine( line, index ) )
 
-//         lastRenderedFrameTime = timestamp
-//       }
-//     }
-//   )
+        lastRenderedFrameTime = timestamp
+      }
+    }
+  )
 
-//   worker.on( 'exit', () =>
-//     {
-//       const index = renderPool.indexOf( worker )
+  worker.on( 'exit', () =>
+    {
+      const index = renderPool.indexOf( worker )
 
-//       if ( index !== -1 )
-//         renderPool.splice( index, 1 )
+      if ( index !== -1 )
+        renderPool.splice( index, 1 )
 
-//       forkRenderThread()
-//     }
-//   )
+      forkRenderThread()
+    }
+  )
 
-//   renderPool.push( worker )
-// }
+  renderPool.push( worker )
+}
 
-// require( 'os' ).cpus().forEach( forkRenderThread )
-
-// let renderPoolQueue = 0
+let renderPoolQueue = 0
 
 function drawLine( line, index )
 {
@@ -52,38 +50,38 @@ function drawLine( line, index )
   process.stdout.write( line )
 }
 
-// function getNextRenderThread()
-// {
-//   if ( renderPool.length === 0 )
-//   {
-//     return null
-//   }
+function getNextRenderThread()
+{
+  if ( renderPool.length === 0 )
+  {
+    return null
+  }
 
-//   if ( renderPoolQueue >= renderPool.length )
-//   {
-//     renderPoolQueue = 0
-//   }
+  if ( renderPoolQueue >= renderPool.length )
+  {
+    renderPoolQueue = 0
+  }
 
-//   return renderPool[ renderPoolQueue++ ]
-// }
+  return renderPool[ renderPoolQueue++ ]
+}
 
 const { EventEmitter } = require( 'events' )
 
-process.stdin.setRawMode( true )
+// process.stdin.setRawMode( true )
 
-process.stdin.on( 'data', key =>
-  {
-    switch ( key.toString() )
-    {
-      case '\u0003':
-      {
-        return process.exit()
-      }
+// process.stdin.on( 'data', key =>
+//   {
+//     switch ( key.toString() )
+//     {
+//       case '\u0003':
+//       {
+//         return process.exit()
+//       }
 
 
-    }
-  }
-)
+//     }
+//   }
+// )
 
 const jsdom = require( 'jsdom' )
 const { JSDOM } = jsdom
@@ -119,20 +117,33 @@ class Engine extends EventEmitter
 			{
         fps: 5,
 
+        multithreading: false,
+
         clearColor: 0x000000
 			},
 
 			options
     )
 
-    this.canvas = createCanvas( 200, 200 )
+    if ( this.options.multithreading )
+    {
+      require( 'os' ).cpus().forEach( forkRenderThread )
+    }
+
+    this.input = new Engine.Input(
+      {
+
+      }
+    )
+
+    this.canvas = createCanvas( 256, 256 )
     this.canvas.addEventListener = () => {}
     this.canvas.style = {}
     
     this.app = new PIXI.Application(
       {
-        width: 200,
-        height: 200,
+        width: 256,
+        height: 256,
         backgroundColor: this.options.clearColor,
         view: this.canvas
       }
@@ -185,28 +196,49 @@ class Engine extends EventEmitter
 
     if ( buf )
     {
-      imageToAscii( buf, ( err, converted ) =>
+      if ( this.options.multithreading )
+      {
+        const renderThread = getNextRenderThread()
+
+        if ( renderThread )
         {
-          // should we ignore the error instead?
-          // or write to a custom console?
-          if ( err ) throw err
+          try
+          {
+            renderThread.send( [ this.canvas.toBuffer(), this.currentTime ] )
+          }
 
-          const lines = converted.split( '\n' ) || []
-
-          lines.forEach( ( line, index ) =>
-            {
-              if ( !this.lines[ index ] || this.lines[ index ] !== line )
-              {
-                drawLine( line, index )
-              }
-            }
-          )
-
-          this.lines = lines
-
-          process.stdout.cursorTo( 0, 0 )
+          catch ( err )
+          {
+            // console.log( err )
+          }
         }
-      )
+      }
+
+      else
+      {
+        imageToAscii( buf, ( err, converted ) =>
+          {
+            // should we ignore the error instead?
+            // or write to a custom console?
+            if ( err ) throw err
+
+            const lines = converted.split( '\n' ) || []
+
+            lines.forEach( ( line, index ) =>
+              {
+                if ( !this.lines[ index ] || this.lines[ index ] !== line )
+                {
+                  drawLine( line, index )
+                }
+              }
+            )
+
+            this.lines = lines
+
+            process.stdout.cursorTo( 0, 0 )
+          }
+        )
+      }
     }
 
     // const renderThread = getNextRenderThread()
@@ -225,5 +257,8 @@ class Engine extends EventEmitter
     // }
 	}
 }
+
+Engine.math = require( path.join( __dirname, 'math' ) )
+Engine.Input = require( path.join( __dirname, 'Input' ) )
 
 module.exports = Engine

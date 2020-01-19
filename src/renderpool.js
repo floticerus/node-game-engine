@@ -10,17 +10,6 @@ function drawLine( line, index, timestamp )
 
 function render( data, timestamp )
 {
-  let timer = setTimeout( () =>
-    {
-      // console.error( new Error( 'thread timeout' ) )
-
-      process.exit()
-    },
-
-    // thread timeout
-    1500
-  )
-
   imageToAscii( data, ( err, converted ) =>
     {
       // should we ignore the error instead?
@@ -28,8 +17,6 @@ function render( data, timestamp )
       if ( err ) throw err
 
       process && process.send( [ ( converted.split( '\n' ) || [] ), timestamp ] )
-
-      clearTimeout( timer )
 
       // ;( converted.split( '\n' ) || [] ).forEach( ( line, index ) => drawLine( line, index, timestamp ) )
     }
