@@ -4,17 +4,39 @@ const { fork } = require( 'child_process' )
 
 let renderPool = []
 
+let lastRenderedFrameTime = 0
+
 require( 'os' ).cpus().forEach( () =>
   {
-    renderPool.push( fork( path.join( __dirname, 'renderpool' ),
+    const worker = fork( path.join( __dirname, 'renderpool' ),
       {
         // stdio: 'inherit'
       }
-    ))
+    )
+
+    worker.on( 'message', ( [ message, timestamp ] ) =>
+      {
+        if ( timestamp > lastRenderedFrameTime )
+        {
+          message.forEach( ( line, index ) => drawLine( line, index ) )
+
+          lastRenderedFrameTime = timestamp
+        }
+      }
+    )
+
+    renderPool.push( worker )
   }
 )
 
 let renderPoolQueue = 0
+
+function drawLine( line, index )
+{
+	process.stdout.cursorTo( 0, index )
+	process.stdout.clearLine()
+  process.stdout.write( line )
+}
 
 function getNextRenderThread()
 {

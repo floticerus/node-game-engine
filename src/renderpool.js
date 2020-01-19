@@ -16,7 +16,9 @@ function render( data, timestamp )
       // or write to a custom console?
       if ( err ) throw err
 
-      ;( converted.split( '\n' ) || [] ).forEach( ( line, index ) => drawLine( line, index, timestamp ) )
+      process.send( [ ( converted.split( '\n' ) || [] ), timestamp ] )
+
+      // ;( converted.split( '\n' ) || [] ).forEach( ( line, index ) => drawLine( line, index, timestamp ) )
     }
   )
 }
