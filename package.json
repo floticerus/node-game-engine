@@ -1,0 +1,22 @@
+{
+  "name": "node-game-engine",
+  "version": "0.0.1",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kevin von Flotow",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "canvas": "^2.6.1",
+    "dirz": "0.0.1",
+    "image-to-ascii": "^3.0.12",
+    "jsdom": "^16.0.0",
+    "meow": "^6.0.0",
+    "performance-now": "^2.1.0",
+    "phaser": "^3.22.0",
+    "pixi.js": "^4.8.9",
+    "workerpool": "^5.0.4"
+  }
+}
