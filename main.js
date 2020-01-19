@@ -12,8 +12,9 @@ const cli = meow(`
     $ node-game [options]
 
   Options
-    --level, -l       Level to load
-    --standalone, -s  Stand-alone mode launches a new terminal for output
+    --level, -l       Level to load (not implemented)
+    --fps, -f         Target FPS (default: 10)
+    --standalone, -s  Stand-alone mode launches a new terminal for output (not implemented)
 `,
   {
     flags:
@@ -22,6 +23,12 @@ const cli = meow(`
       {
         type: 'string',
         alias: 'l'
+      },
+      'fps':
+      {
+        type: 'number',
+        alias: 'f',
+        default: 10
       },
       'standalone':
       {
@@ -40,7 +47,7 @@ const PIXI = require( 'pixi.js' )
 
 let engine = new Engine(
   {
-    fps: 10,
+    fps: cli.flags.fps,
 
     start: function ()
     {

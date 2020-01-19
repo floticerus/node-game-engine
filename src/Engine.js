@@ -119,7 +119,7 @@ class Engine extends EventEmitter
 			{
         fps: 5,
 
-        clearColor: '#000'
+        clearColor: 0x000000
 			},
 
 			options
@@ -133,7 +133,7 @@ class Engine extends EventEmitter
       {
         width: 200,
         height: 200,
-        backgroundColor: 0x008090,
+        backgroundColor: this.options.clearColor,
         view: this.canvas
       }
     )
@@ -171,15 +171,51 @@ class Engine extends EventEmitter
 
     this.lastUpdateTime = this.currentTime
 
-    imageToAscii( this.canvas.toBuffer(), ( err, converted ) =>
-      {
-        // should we ignore the error instead?
-        // or write to a custom console?
-        if ( err ) throw err
+    let buf
 
-        ;( converted.split( '\n' ) || [] ).forEach( ( line, index ) => drawLine( line, index ) )
-      }
-    )
+    try
+    {
+      buf = this.canvas.toBuffer()
+    }
+
+    catch ( err )
+    {
+      return // console.error( err )
+    }
+
+    if ( buf )
+    {
+      imageToAscii( buf, ( err, converted ) =>
+        {
+          // should we ignore the error instead?
+          // or write to a custom console?
+          if ( err ) throw err
+
+          const lines = converted.split( '\n' ) || []
+
+          lines.forEach( ( line, index ) =>
+            {
+              if ( !this.lines[ index ] || this.lines[ index ] !== line )
+              {
+                setTimeout( () =>
+                  {
+                    drawLine( line, index )
+
+                    process.stdout.cursorTo( 0, 0 )
+                  },
+                  
+                  index * 200
+                )
+              }
+            }
+          )
+
+          this.lines = lines
+
+          // process.stdout.cursorTo( 0, 0 )
+        }
+      )
+    }
 
     // const renderThread = getNextRenderThread()
 
