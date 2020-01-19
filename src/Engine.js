@@ -197,22 +197,14 @@ class Engine extends EventEmitter
             {
               if ( !this.lines[ index ] || this.lines[ index ] !== line )
               {
-                setTimeout( () =>
-                  {
-                    drawLine( line, index )
-
-                    process.stdout.cursorTo( 0, 0 )
-                  },
-                  
-                  index * 200
-                )
+                drawLine( line, index )
               }
             }
           )
 
           this.lines = lines
 
-          // process.stdout.cursorTo( 0, 0 )
+          process.stdout.cursorTo( 0, 0 )
         }
       )
     }
