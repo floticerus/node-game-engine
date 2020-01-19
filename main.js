@@ -3,8 +3,6 @@
 
 const path = require( 'path' )
 
-const dirz = require( 'dirz' )
-
 const Engine = require( path.join( __dirname, 'src', 'Engine' ) )
 
 const meow = require( 'meow' )

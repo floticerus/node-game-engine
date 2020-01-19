@@ -6,28 +6,39 @@ let renderPool = []
 
 let lastRenderedFrameTime = 0
 
-require( 'os' ).cpus().forEach( () =>
-  {
-    const worker = fork( path.join( __dirname, 'renderpool' ),
+function forkRenderThread()
+{
+  const worker = fork( path.join( __dirname, 'renderpool' ),
+    {
+      // stdio: 'inherit'
+    }
+  )
+
+  worker.on( 'message', ( [ message, timestamp ] ) =>
+    {
+      if ( timestamp > lastRenderedFrameTime )
       {
-        // stdio: 'inherit'
+        message.forEach( ( line, index ) => drawLine( line, index ) )
+
+        lastRenderedFrameTime = timestamp
       }
-    )
+    }
+  )
 
-    worker.on( 'message', ( [ message, timestamp ] ) =>
-      {
-        if ( timestamp > lastRenderedFrameTime )
-        {
-          message.forEach( ( line, index ) => drawLine( line, index ) )
+  worker.on( 'exit', () =>
+    {
+      const index = renderPool.indexOf( worker )
 
-          lastRenderedFrameTime = timestamp
-        }
-      }
-    )
+      index !== -1 && renderPool.splice( index, 1 )
 
-    renderPool.push( worker )
-  }
-)
+      forkRenderThread()
+    }
+  )
+
+  renderPool.push( worker )
+}
+
+require( 'os' ).cpus().forEach( forkRenderThread )
 
 let renderPoolQueue = 0
 
@@ -119,7 +130,7 @@ class Engine extends EventEmitter
       {
         width: 200,
         height: 200,
-        backgroundColor: 0x000000,
+        backgroundColor: 0x008090,
         view: this.canvas
       }
     )

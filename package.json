@@ -10,7 +10,6 @@
   "license": "UNLICENSED",
   "dependencies": {
     "canvas": "^2.6.1",
-    "dirz": "0.0.1",
     "image-to-ascii": "^3.0.12",
     "jsdom": "^16.0.0",
     "meow": "^6.0.0",
