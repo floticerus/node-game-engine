@@ -12,13 +12,13 @@ function render( data, timestamp )
 {
   let timer = setTimeout( () =>
     {
-      console.error( new Error( 'thread timeout' ) )
+      // console.error( new Error( 'thread timeout' ) )
 
       process.exit()
     },
 
     // thread timeout
-    200
+    1500
   )
 
   imageToAscii( data, ( err, converted ) =>

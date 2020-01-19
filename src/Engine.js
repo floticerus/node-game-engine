@@ -1,46 +1,49 @@
 const path = require( 'path' )
 
-const { fork } = require( 'child_process' )
+const imageToAscii = require( 'image-to-ascii' )
 
-let renderPool = []
+// const { fork } = require( 'child_process' )
 
-let lastRenderedFrameTime = 0
+// let renderPool = []
 
-function forkRenderThread()
-{
-  const worker = fork( path.join( __dirname, 'renderpool' ),
-    {
-      // stdio: 'inherit'
-    }
-  )
+// let lastRenderedFrameTime = 0
 
-  worker.on( 'message', ( [ message, timestamp ] ) =>
-    {
-      if ( timestamp > lastRenderedFrameTime )
-      {
-        message.forEach( ( line, index ) => drawLine( line, index ) )
+// function forkRenderThread()
+// {
+//   const worker = fork( path.join( __dirname, 'renderpool' ),
+//     {
+//       // stdio: 'inherit'
+//     }
+//   )
 
-        lastRenderedFrameTime = timestamp
-      }
-    }
-  )
+//   worker.on( 'message', ( [ message, timestamp ] ) =>
+//     {
+//       if ( timestamp > lastRenderedFrameTime )
+//       {
+//         message.forEach( ( line, index ) => drawLine( line, index ) )
 
-  worker.on( 'exit', () =>
-    {
-      const index = renderPool.indexOf( worker )
+//         lastRenderedFrameTime = timestamp
+//       }
+//     }
+//   )
 
-      index !== -1 && renderPool.splice( index, 1 )
+//   worker.on( 'exit', () =>
+//     {
+//       const index = renderPool.indexOf( worker )
 
-      forkRenderThread()
-    }
-  )
+//       if ( index !== -1 )
+//         renderPool.splice( index, 1 )
 
-  renderPool.push( worker )
-}
+//       forkRenderThread()
+//     }
+//   )
 
-require( 'os' ).cpus().forEach( forkRenderThread )
+//   renderPool.push( worker )
+// }
 
-let renderPoolQueue = 0
+// require( 'os' ).cpus().forEach( forkRenderThread )
+
+// let renderPoolQueue = 0
 
 function drawLine( line, index )
 {
@@ -49,20 +52,20 @@ function drawLine( line, index )
   process.stdout.write( line )
 }
 
-function getNextRenderThread()
-{
-  if ( renderPool.length === 0 )
-  {
-    return null
-  }
+// function getNextRenderThread()
+// {
+//   if ( renderPool.length === 0 )
+//   {
+//     return null
+//   }
 
-  if ( renderPoolQueue >= renderPool.length )
-  {
-    renderPoolQueue = 0
-  }
+//   if ( renderPoolQueue >= renderPool.length )
+//   {
+//     renderPoolQueue = 0
+//   }
 
-  return renderPool[ renderPoolQueue++ ]
-}
+//   return renderPool[ renderPoolQueue++ ]
+// }
 
 const { EventEmitter } = require( 'events' )
 
@@ -168,20 +171,30 @@ class Engine extends EventEmitter
 
     this.lastUpdateTime = this.currentTime
 
-    const renderThread = getNextRenderThread()
-
-    if ( renderThread )
-    {
-      try
+    imageToAscii( this.canvas.toBuffer(), ( err, converted ) =>
       {
-        renderThread.send( [ this.canvas.toBuffer(), this.currentTime ] )
-      }
+        // should we ignore the error instead?
+        // or write to a custom console?
+        if ( err ) throw err
 
-      catch ( err )
-      {
-        // console.log( err )
+        ;( converted.split( '\n' ) || [] ).forEach( ( line, index ) => drawLine( line, index ) )
       }
-    }
+    )
+
+    // const renderThread = getNextRenderThread()
+
+    // if ( renderThread )
+    // {
+    //   try
+    //   {
+    //     renderThread.send( [ this.canvas.toBuffer(), this.currentTime ] )
+    //   }
+
+    //   catch ( err )
+    //   {
+    //     // console.log( err )
+    //   }
+    // }
 	}
 }
 
