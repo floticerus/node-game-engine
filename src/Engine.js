@@ -75,7 +75,7 @@ const stripAnsi = require( 'strip-ansi' )
 
 function drawLine( line, index )
 {
-	process.stdout.cursorTo( 0, index )
+  process.stdout.cursorTo( 0, index )
   process.stdout.clearLine()
   
   let lineString = line.toString( 'utf-8' )
@@ -158,23 +158,23 @@ const now = require( 'performance-now' )
 
 class Engine extends EventEmitter
 {
-	constructor( options = {} )
-	{
+  constructor( options = {} )
+  {
     super()
     
     // singleton :(
     Engine.instance = this
 
-		this.options = Object.assign(
-			{
+    this.options = Object.assign(
+      {
         fps: 5,
 
         multithreading: false,
 
         clearColor: 0x000000
-			},
+      },
 
-			options
+      options
     )
 
     if ( this.options.multithreading )
@@ -214,13 +214,13 @@ class Engine extends EventEmitter
     this.lastUpdateTime = 0
     this.deltaTime = 0
 
-		this.updateLoop
+    this.updateLoop
 
-		this.lines = []
-	}
+    this.lines = []
+  }
 
-	start()
-	{
+  start()
+  {
     if ( this.updateLoop )
     {
       clearInterval( this.updateLoop )
@@ -231,10 +231,10 @@ class Engine extends EventEmitter
     this.options.start && this.options.start.call( this )
 
     this.updateLoop = setInterval( this.update.bind( this ), 1000 / this.options.fps )
-	}
+  }
 
-	update()
-	{
+  update()
+  {
     this.currentTime = now()
     this.deltaTime = this.currentTime - this.lastUpdateTime
     this.deltaTime /= 1000 // convert to ms
