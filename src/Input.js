@@ -113,20 +113,20 @@ function getKeyFromMap( key, map )
 
 class Input extends EventEmitter
 {
-	constructor( options = {} )
-	{
-		super()
+  constructor( options = {} )
+  {
+    super()
 
-		this.options = Object.assign(
-			{
+    this.options = Object.assign(
+      {
         
-			},
+      },
 
-			options
+      options
     )
 
-		process.stdin.on( 'data', key =>
-			{
+    process.stdin.on( 'data', key =>
+      {
         const mapped = getKeyFromMap( key )
 
         if ( mapped )
@@ -135,8 +135,8 @@ class Input extends EventEmitter
 
           this.keyAction( mapped )
         }
-			}
-		)
+      }
+    )
   }
   
   keyAction( key )
