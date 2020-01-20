@@ -24,8 +24,53 @@ let engine = new Engine(
       this.hamkey.scale.set( 0.001 )
       this.hamkey.x = 100
       this.hamkey.y = 100
-      this.targetPositionX = this.hamkey.x
-      this.targetPositionY = this.hamkey.y
+
+      Object.defineProperty( this, 'targetPositionX',
+        ( _targetPositionX => 
+          {
+            return {
+              get: () =>
+              {
+                return _targetPositionX
+              },
+
+              set: value =>
+              {
+                _targetPositionX = Engine.math.clamp(
+                  value,
+                  this.hamkey.width / 2,
+                  this.canvas.width - ( this.hamkey.width / 2 )
+                )
+              }
+            }
+          }
+        )( this.hamkey.x )
+      )
+
+      Object.defineProperty( this, 'targetPositionY',
+        ( _targetPositionY => 
+          {
+            return {
+              get: () =>
+              {
+                return _targetPositionY
+              },
+
+              set: value =>
+              {
+                _targetPositionY = Engine.math.clamp(
+                  value,
+                  this.hamkey.height,
+                  this.canvas.height
+                )
+              }
+            }
+          }
+        )( this.hamkey.y )
+      )
+
+      // this.targetPositionX = this.hamkey.x
+      // this.targetPositionY = this.hamkey.y
 
       this.input.on( 'right-arrow', this.options.pressedRightArrow.bind( this ) )
       this.input.on( 'left-arrow', this.options.pressedLeftArrow.bind( this ) )
