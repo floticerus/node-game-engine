@@ -97,28 +97,16 @@ let engine = new Engine(
       //   )
       // }
 
-      this.hamkey.x = Engine.math.clamp(
-        Engine.math.lerp(
-          this.hamkey.x,
-          this.targetPositionX,
-          this.options.moveSpeed * deltaTime
-        ),
-
-        this.hamkey.width / 2,
-        
-        this.canvas.width - ( this.hamkey.width / 2 )
+      this.hamkey.x = Engine.math.lerp(
+        this.hamkey.x,
+        this.targetPositionX,
+        this.options.moveSpeed * deltaTime
       )
 
-      this.hamkey.y = Engine.math.clamp(
-        Engine.math.lerp(
-          this.hamkey.y,
-          this.targetPositionY,
-          this.options.moveSpeed * deltaTime
-        ),
-
-        this.hamkey.height,
-        
-        this.canvas.height
+      this.hamkey.y = Engine.math.lerp(
+        this.hamkey.y,
+        this.targetPositionY,
+        this.options.moveSpeed * deltaTime
       )
     },
 
