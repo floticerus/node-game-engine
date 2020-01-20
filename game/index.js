@@ -8,18 +8,18 @@ const PIXI = require( 'pixi.js' )
 
 let engine = new Engine(
   {
-    fps: cli.flags.fps,
+    fps: cli.fps,
 
     moveAmount: 30,
     moveSpeed: 3,
 
     clearColor: 0x105090,
 
-    multithreading: cli.flags.multithreading,
+    multithreading: cli.multithreading,
 
     start: function ()
     {
-      this.hamkey = PIXI.Sprite.from( `${ __dirname }/hamkey2.jpg` )
+      this.hamkey = PIXI.Sprite.from( `${ __dirname }/assets/hamkey2.jpg` )
       this.hamkey.anchor.set( 0.5, 1 )
       this.hamkey.scale.set( 0.001 )
       this.hamkey.x = 100

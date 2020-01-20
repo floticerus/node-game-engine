@@ -1,18 +1,27 @@
 {
-  "name": "node-game-engine",
+  "name": "ascii-engine",
   "version": "0.0.1",
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+    "build-linux-armv7": "pkg main.js -c package.json --targets node12-linux-armv7 --out-path build/",
+    "build-linux": "pkg main.js -c package.json --targets node12-linux-x64 --out-path build/",
+    "build-win": "pkg main.js -c package.json --targets node12-win-x64 --out-path build/",
+    "build-mac": "pkg main.js -c package.json --targets node12-macos-x64 --out-path build/",
+    "build-all": "pkg main.js -c package.json --targets node12-linux-armv7,node12-linux-x64,node12-linux-x86,node12-win-x64,node12-macos-x64 --out-path build/"
+  },
+  "pkg": {
+    "scripts": "src/**/*",
+    "assets": "game/**/*"
   },
   "author": "Kevin von Flotow",
   "license": "UNLICENSED",
   "dependencies": {
     "canvas": "^2.6.1",
+    "command-line-args": "^5.1.1",
     "image-to-ascii": "^3.0.12",
-    "jsdom": "^16.0.0",
-    "meow": "^6.0.0",
+    "jsdom": "^16.0.1",
     "performance-now": "^2.1.0",
     "pixi.js": "^4.8.9",
     "strip-ansi": "^6.0.0"
