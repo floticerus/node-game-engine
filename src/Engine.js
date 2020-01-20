@@ -18,9 +18,25 @@ function forkRenderThread()
 
   worker.on( 'message', ( [ message, timestamp ] ) =>
     {
+      if ( !Engine.instance )
+      {
+        return
+      }
+
       if ( timestamp > lastRenderedFrameTime )
       {
-        message.forEach( ( line, index ) => drawLine( line, index ) )
+        message.forEach( ( line, index ) =>
+          {
+            if ( !Engine.instance.lines[ index ] || Engine.instance.lines[ index ] !== line )
+            {
+              drawLine( line, index )
+            }
+          }
+        )
+
+        Engine.instance.lines = message
+
+        process.stdout.cursorTo( 0, 0 )
 
         lastRenderedFrameTime = timestamp
       }
@@ -41,13 +57,40 @@ function forkRenderThread()
   renderPool.push( worker )
 }
 
+process.on( 'exit', () =>
+  {
+    renderPool.forEach( child => child.kill() )
+  }
+)
+
 let renderPoolQueue = 0
+
+const stripAnsi = require( 'strip-ansi' )
 
 function drawLine( line, index )
 {
 	process.stdout.cursorTo( 0, index )
-	process.stdout.clearLine()
-  process.stdout.write( line )
+  process.stdout.clearLine()
+  
+  let lineString = line.toString( 'utf-8' )
+
+  // center text
+  let centered = ''
+
+  const [ width, height ] = [
+    process.stdout.columns || 80,
+    process.stdout.rows || 24
+  ]
+
+  // horizontal center
+  for ( let i = 0, l = ( width / 2 ) - ( stripAnsi( lineString ).length / 2 ); i < l; i++ )
+  {
+    centered += ' '
+  }
+
+  centered += lineString
+
+  process.stdout.write( Buffer.from( centered ) )
 }
 
 function getNextRenderThread()
@@ -111,7 +154,10 @@ class Engine extends EventEmitter
 {
 	constructor( options = {} )
 	{
-		super()
+    super()
+    
+    // singleton :(
+    Engine.instance = this
 
 		this.options = Object.assign(
 			{
@@ -136,14 +182,23 @@ class Engine extends EventEmitter
       }
     )
 
-    this.canvas = createCanvas( 256, 256 )
+    const [ width, height ] = [
+      process.stdout.columns || 80,
+      process.stdout.rows || 24
+    ]
+
+    this.canvas = createCanvas(
+      256 * ( 4 / 3 ),
+      256
+    )
+
     this.canvas.addEventListener = () => {}
     this.canvas.style = {}
     
     this.app = new PIXI.Application(
       {
-        width: 256,
-        height: 256,
+        width: this.canvas.width,
+        height: this.canvas.height,
         backgroundColor: this.options.clearColor,
         view: this.canvas
       }
@@ -216,7 +271,7 @@ class Engine extends EventEmitter
 
       else
       {
-        imageToAscii( buf, ( err, converted ) =>
+        imageToAscii( buf, { colored: true }, ( err, converted ) =>
           {
             // should we ignore the error instead?
             // or write to a custom console?
@@ -257,6 +312,8 @@ class Engine extends EventEmitter
     // }
 	}
 }
+
+Engine.instance = null
 
 Engine.math = require( path.join( __dirname, 'math' ) )
 Engine.Input = require( path.join( __dirname, 'Input' ) )

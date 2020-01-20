@@ -59,6 +59,8 @@ let engine = new Engine(
     moveAmount: 25,
     moveSpeed: 1,
 
+    clearColor: 0x105090,
+
     multithreading: cli.flags.multithreading,
 
     start: function ()
