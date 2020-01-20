@@ -5,13 +5,45 @@ process.stdin.setRawMode( true )
 const keyMap = {
   '\u0003': 'close',
 
-  '\u001B\u005B\u0044': 'left-arrow',
+  '\u001B':
+  {
+    '\u005B':
+    {
+      '\u0044': 'left-arrow',
+      '\u0043': 'right-arrow',
+      '\u0041': 'up-arrow',
+      '\u0042': 'down-arrow'
+    }
+  }
+}
 
-  '\u001B\u005B\u0043': 'right-arrow',
+/**
+ * 
+ * @param {Buffer|string} key 
+ */
+function getKeyFromMap( key, map )
+{
+  key = Buffer.isBuffer( key ) ? key.toString() : key
 
-  '\u001B\u005B\u0041': 'up-arrow',
+  map = map || keyMap
 
-  '\u001B\u005B\u0042': 'down-arrow'
+  for ( let i = 0; i < key.length; i++ )
+  {
+    if ( map[ key[ i ] ] )
+    {
+      if ( Object.prototype.toString.call( map[ key[ i ] ] ) === '[object String]' )
+      {
+        return map[ key[ i ] ]
+      }
+
+      else
+      {
+        return getKeyFromMap( key.substring( 1 ), map[ key[ i ] ] )
+      }
+    }
+  }
+
+  return null
 }
 
 class Input extends EventEmitter
@@ -27,23 +59,16 @@ class Input extends EventEmitter
 
 			options
     )
-    
-    // key > [ listeners ]
-    this.inputListeners = {}
 
 		process.stdin.on( 'data', key =>
 			{
-        const keyString = key.toString()
+        const mapped = getKeyFromMap( key )
 
-        // console.log( `pressed key: ${ key }` )
-
-        this.emit( keyString )
-
-        if ( keyMap[ keyString ] )
+        if ( mapped )
         {
-          this.emit( keyMap[ keyString ] )
+          this.emit( mapped )
 
-          this.keyAction( keyMap[ keyString ] )
+          this.keyAction( mapped )
         }
 			}
 		)
@@ -57,16 +82,6 @@ class Input extends EventEmitter
         return process.exit()
     }
   }
-
-  /**
-   * 
-   * @param {string|symbol} event 
-   * @param {(...args) void} listener 
-   */
-	// on( event, listener )
-	// {
-  //   return super.on( eventName, listener )
-  // }
 }
 
 module.exports = Input

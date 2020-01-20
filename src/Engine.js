@@ -10,7 +10,7 @@ let lastRenderedFrameTime = 0
 
 function forkRenderThread()
 {
-  const worker = fork( path.join( __dirname, 'renderpool' ),
+  const worker = fork( `${ __dirname }/renderpool.js`,
     {
       // stdio: 'inherit'
     }
@@ -56,6 +56,12 @@ function forkRenderThread()
 
   renderPool.push( worker )
 }
+
+process.on( 'SIGWINCH', () =>
+  {
+    Engine.instance && Engine.instance.refreshLines()
+  }
+)
 
 process.on( 'exit', () =>
   {
@@ -310,12 +316,17 @@ class Engine extends EventEmitter
     //     // console.log( err )
     //   }
     // }
-	}
+  }
+  
+  refreshLines()
+  {
+    this.lines.forEach( drawLine )
+  }
 }
 
 Engine.instance = null
 
-Engine.math = require( path.join( __dirname, 'math' ) )
-Engine.Input = require( path.join( __dirname, 'Input' ) )
+Engine.math = require( './math' )
+Engine.Input = require( './Input' )
 
 module.exports = Engine

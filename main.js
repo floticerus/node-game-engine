@@ -3,7 +3,7 @@
 
 const path = require( 'path' )
 
-const Engine = require( path.join( __dirname, 'src', 'Engine' ) )
+const Engine = require( './src/Engine' )
 
 const meow = require( 'meow' )
 
@@ -56,8 +56,8 @@ let engine = new Engine(
   {
     fps: cli.flags.fps,
 
-    moveAmount: 25,
-    moveSpeed: 1,
+    moveAmount: 30,
+    moveSpeed: 3,
 
     clearColor: 0x105090,
 
@@ -87,16 +87,39 @@ let engine = new Engine(
 
       this.hamkey.scale.set( ( 0.75 + ( Math.abs( Math.sin( this.currentTime * 0.0006 ) ) * 0.25 ) ) * 0.1 )
 
-      this.hamkey.x = Engine.math.lerp(
-        this.hamkey.x,
-        this.targetPositionX,
-        this.options.moveSpeed * deltaTime
+      if ( Math.abs( this.targetPositionX - ( this.canvas.width / 2 ) ) > this.canvas.width * 0.5 )
+      {
+        this.targetPositionX = Engine.math.lerp(
+          this.targetPositionX,
+          this.canvas.width / 2,
+          this.options.moveSpeed
+            // * Math.abs( this.targetPositionX - ( this.canvas.width / 2 ) ) * 100
+            * deltaTime
+        )
+      }
+
+      this.hamkey.x = Engine.math.clamp(
+        Engine.math.lerp(
+          this.hamkey.x,
+          this.targetPositionX,
+          this.options.moveSpeed * deltaTime
+        ),
+
+        this.hamkey.width / 2,
+        
+        this.canvas.width - ( this.hamkey.width / 2 )
       )
 
-      this.hamkey.y = Engine.math.lerp(
-        this.hamkey.y,
-        this.targetPositionY,
-        this.options.moveSpeed * deltaTime
+      this.hamkey.y = Engine.math.clamp(
+        Engine.math.lerp(
+          this.hamkey.y,
+          this.targetPositionY,
+          this.options.moveSpeed * deltaTime
+        ),
+
+        this.hamkey.height,
+        
+        this.canvas.height
       )
     },
 
