@@ -83,10 +83,8 @@ function drawLine( line, index )
   // center text
   let centered = ''
 
-  const [ width, height ] = [
-    process.stdout.columns || 80,
-    process.stdout.rows || 24
-  ]
+  const width = process.stdout.columns || 80
+  // const height = process.stdout.rows || 24
 
   // horizontal center
   for ( let i = 0, l = ( width / 2 ) - ( stripAnsi( lineString ).length / 2 ); i < l; i++ )
@@ -239,7 +237,7 @@ class Engine extends EventEmitter
     this.deltaTime = this.currentTime - this.lastUpdateTime
     this.deltaTime /= 1000 // convert to ms
 
-    this.options.update && this.options.update.call( this, [ this.deltaTime ] )
+    this.options.update && this.options.update.call( this )
 
     this.lastUpdateTime = this.currentTime
 

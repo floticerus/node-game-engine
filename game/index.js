@@ -21,7 +21,7 @@ let engine = new Engine(
     {
       this.hamkey = PIXI.Sprite.from( `${ __dirname }/assets/hamkey2.jpg` )
       this.hamkey.anchor.set( 0.5, 1 )
-      this.hamkey.scale.set( 0.001 )
+      this.hamkey.scale.set( 0.1 )
       this.hamkey.x = 100
       this.hamkey.y = 100
 
@@ -72,19 +72,19 @@ let engine = new Engine(
       // this.targetPositionX = this.hamkey.x
       // this.targetPositionY = this.hamkey.y
 
-      this.input.on( 'right-arrow', this.options.pressedRightArrow.bind( this ) )
-      this.input.on( 'left-arrow', this.options.pressedLeftArrow.bind( this ) )
-      this.input.on( 'up-arrow', this.options.pressedUpArrow.bind( this ) )
-      this.input.on( 'down-arrow', this.options.pressedDownArrow.bind( this ) )
+      this.input.on( 'right', this.options.pressedRightArrow.bind( this ) )
+      this.input.on( 'left', this.options.pressedLeftArrow.bind( this ) )
+      this.input.on( 'up', this.options.pressedUpArrow.bind( this ) )
+      this.input.on( 'down', this.options.pressedDownArrow.bind( this ) )
 
       this.app.stage.addChild( this.hamkey )
     },
 
-    update: function ( deltaTime )
+    update: function ()
     {
       // this.hamkey.rotation += 0.25 * deltaTime
 
-      this.hamkey.scale.set( ( 0.75 + ( Math.abs( Math.sin( this.currentTime * 0.0006 ) ) * 0.25 ) ) * 0.1 )
+      // this.hamkey.scale.set( ( 0.75 + ( Math.abs( Math.sin( this.currentTime * 0.0006 ) ) * 0.25 ) ) * 0.1 )
 
       // if ( Math.abs( this.targetPositionX - ( this.canvas.width / 2 ) ) > this.canvas.width * 0.5 )
       // {
@@ -100,13 +100,13 @@ let engine = new Engine(
       this.hamkey.x = Engine.math.lerp(
         this.hamkey.x,
         this.targetPositionX,
-        this.options.moveSpeed * deltaTime
+        this.options.moveSpeed * this.deltaTime
       )
 
       this.hamkey.y = Engine.math.lerp(
         this.hamkey.y,
         this.targetPositionY,
-        this.options.moveSpeed * deltaTime
+        this.options.moveSpeed * this.deltaTime
       )
     },
 
