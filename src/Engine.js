@@ -186,10 +186,10 @@ class Engine extends EventEmitter
       }
     )
 
-    const [ width, height ] = [
-      process.stdout.columns || 80,
-      process.stdout.rows || 24
-    ]
+    // const [ width, height ] = [
+    //   process.stdout.columns || 80,
+    //   process.stdout.rows || 24
+    // ]
 
     this.canvas = createCanvas(
       256 * ( 4 / 3 ),
@@ -299,21 +299,6 @@ class Engine extends EventEmitter
         )
       }
     }
-
-    // const renderThread = getNextRenderThread()
-
-    // if ( renderThread )
-    // {
-    //   try
-    //   {
-    //     renderThread.send( [ this.canvas.toBuffer(), this.currentTime ] )
-    //   }
-
-    //   catch ( err )
-    //   {
-    //     // console.log( err )
-    //   }
-    // }
   }
   
   refreshLines()
@@ -324,7 +309,9 @@ class Engine extends EventEmitter
 
 Engine.instance = null
 
+module.exports = Engine
+
+Engine.PIXI = require( 'pixi.js' )
+
 Engine.math = require( './math' )
 Engine.Input = require( './Input' )
-
-module.exports = Engine

@@ -48,7 +48,8 @@ class Input extends EventEmitter
     
     r += key.name
 
-    return r
+    // make sure we always return a lowercase string
+    return r.toLowerCase()
   }
   
   static keyAction( key )

@@ -1,7 +1,7 @@
 {
   "name": "ascii-engine",
   "version": "0.0.1",
-  "description": "",
+  "description": "ASCII powered game engine for terminals",
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
@@ -13,13 +13,14 @@
   },
   "pkg": {
     "scripts": "src/**/*",
-    "assets": "game/**/*"
+    "assets": "game/assets/**/*"
   },
   "author": "Kevin von Flotow",
   "license": "UNLICENSED",
   "dependencies": {
     "canvas": "^2.6.1",
     "command-line-args": "^5.1.1",
+    "command-line-usage": "^6.1.0",
     "image-to-ascii": "^3.0.12",
     "jsdom": "^16.0.1",
     "performance-now": "^2.1.0",
