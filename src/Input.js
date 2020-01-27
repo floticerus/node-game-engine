@@ -1,3 +1,5 @@
+const Engine = require( './Engine' )
+
 const { EventEmitter } = require( 'events' )
 
 const readline = require( 'readline' )
@@ -11,13 +13,13 @@ class Input extends EventEmitter
   {
     super()
 
-    this.options = Object.assign(
+    this.options = Engine.util.merge.all([
       {
         
       },
 
       options
-    )
+    ])
 
     process.stdin.on( 'keypress', ( str, key ) =>
       {

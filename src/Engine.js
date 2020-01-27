@@ -163,7 +163,7 @@ class Engine extends EventEmitter
     // singleton :(
     Engine.instance = this
 
-    this.options = Object.assign(
+    this.options = Engine.util.merge.all([
       {
         fps: 5,
 
@@ -173,7 +173,7 @@ class Engine extends EventEmitter
       },
 
       options
-    )
+    ])
 
     if ( this.options.multithreading )
     {
@@ -314,4 +314,5 @@ module.exports = Engine
 Engine.PIXI = require( 'pixi.js' )
 
 Engine.math = require( './math' )
+Engine.util = require( './util' )
 Engine.Input = require( './Input' )

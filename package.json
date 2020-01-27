@@ -21,6 +21,7 @@
     "canvas": "^2.6.1",
     "command-line-args": "^5.1.1",
     "command-line-usage": "^6.1.0",
+    "deepmerge": "^4.2.2",
     "image-to-ascii": "^3.0.12",
     "jsdom": "^16.0.1",
     "performance-now": "^2.1.0",
